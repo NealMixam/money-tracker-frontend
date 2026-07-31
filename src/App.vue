@@ -1,11 +1,27 @@
-<script setup></script>
+<script setup>
+import { onMounted, ref } from "vue";
+import { useAuthStore } from "@/stores/auth.store";
+
+const auth = useAuthStore();
+const isInitializing = ref(true);
+
+onMounted(async () => {
+  await auth.init();
+  isInitializing.value = false;
+});
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div v-if="isInitializing" class="app-loader">Загрузка...</div>
+  <router-view v-else />
 </template>
 
-<style scoped></style>
+<style scoped>
+.app-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 18px;
+}
+</style>
