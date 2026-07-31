@@ -1,13 +1,16 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "@/stores/auth.store";
 
 const router = useRouter();
+const route = useRoute();
 const auth = useAuthStore();
 
 const form = ref({ email: "", password: "" });
 const validationErrors = ref({});
+
+const showRegisteredMessage = computed(() => route.query.registered === "1");
 
 function validate() {
   validationErrors.value = {};
@@ -21,7 +24,7 @@ async function handleSubmit() {
   try {
     await auth.login(form.value);
     router.push("/");
-  } catch (e) {}
+  } catch (e) { }
 }
 </script>
 
@@ -29,14 +32,13 @@ async function handleSubmit() {
   <form class="auth-form" @submit.prevent="handleSubmit">
     <h1 class="auth-form__title">Вход</h1>
 
+    <p v-if="showRegisteredMessage" class="auth-form__success">
+      Аккаунт успешно создан. Войдите, используя свои данные.
+    </p>
+
     <div class="auth-form__field">
       <label for="email">Email</label>
-      <input
-        id="email"
-        v-model="form.email"
-        type="email"
-        autocomplete="email"
-      />
+      <input id="email" v-model="form.email" type="email" autocomplete="email" />
       <span v-if="validationErrors.email" class="auth-form__error">{{
         validationErrors.email
       }}</span>
@@ -44,12 +46,7 @@ async function handleSubmit() {
 
     <div class="auth-form__field">
       <label for="password">Пароль</label>
-      <input
-        id="password"
-        v-model="form.password"
-        type="password"
-        autocomplete="current-password"
-      />
+      <input id="password" v-model="form.password" type="password" autocomplete="current-password" />
       <span v-if="validationErrors.password" class="auth-form__error">{{
         validationErrors.password
       }}</span>
@@ -108,5 +105,14 @@ button {
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.auth-form__success {
+  color: #2e7d32;
+  background: #e8f5e9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
 }
 </style>

@@ -18,9 +18,7 @@ export const useAuthStore = defineStore("auth", {
       this.isLoading = true;
       this.error = null;
       try {
-        const data = await authApi.register(payload);
-        this.setToken(data.token);
-        await this.fetchMe();
+        await authApi.register(payload);
       } catch (e) {
         this.error = e.message;
         throw e;
@@ -50,6 +48,10 @@ export const useAuthStore = defineStore("auth", {
     },
 
     setToken(token) {
+      if (!token) {
+        console.error("setToken вызван без токена");
+        return;
+      }
       this.token = token;
       localStorage.setItem("token", token);
     },
